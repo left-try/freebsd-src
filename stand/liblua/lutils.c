@@ -32,7 +32,8 @@
 #include "lstd.h"
 #include "lutils.h"
 #include "bootstrap.h"
-
+#include <efi.h>
+#include <efilib.h> 
 /*
  * Like loader.perform, except args are passed already parsed
  * on the stack.
@@ -385,6 +386,56 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
+static int
+lua_efi_get_vendor(lua_State *L)
+{
+    if (ST == NULL || ST->FirmwareVendor == NULL) {
+        lua_pushnil(L);
+    } else {
+        CHAR16 *fwvendor = ST->FirmwareVendor;
+        char vendor[128];
+        size_t i;
+        for (i = 0; i < sizeof(vendor)-1 && fwvendor[i] != 0; i++) {
+            vendor[i] = (fwvendor[i] < 128 ? fwvendor[i] : '?');
+        }
+        vendor[i] = '\0';
+        lua_pushstring(L, vendor);
+    }
+    return 1;
+}
+
+static int
+lua_efi_get_variable(lua_State *L)
+{
+    const char *varname = luaL_checkstring(L, 1);
+    if (varname == NULL) {
+        lua_pushnil(L);
+        return 1;
+    }
+    EFI_GUID GlobalVarGuid = EFI_GLOBAL_VARIABLE;
+    UINTN dataSize = 0;
+    EFI_STATUS status;
+    status = RS->GetVariable((CHAR16*)varname, &GlobalVarGuid, NULL, &dataSize, NULL);
+    if (status == EFI_BUFFER_TOO_SMALL && dataSize > 0) {
+        UINT8 *data = malloc(dataSize);
+        if (!data) {
+            lua_pushnil(L);
+            return 1;
+        }
+        status = RS->GetVariable((CHAR16*)varname, &GlobalVarGuid, NULL, &dataSize, data);
+        if (EFI_ERROR(status)) {
+            free(data);
+            lua_pushnil(L);
+        } else {
+            lua_pushlstring(L, (const char *)data, dataSize);
+        }
+        free(data);
+    } else {
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(command),
@@ -401,6 +452,8 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
+	{ "efi_get_vendor",   lua_efi_get_vendor },
+    	{ "efi_get_variable", lua_efi_get_variable },
 	{ NULL, NULL },
 };
 
