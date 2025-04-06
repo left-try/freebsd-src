@@ -32,8 +32,7 @@
 #include "lstd.h"
 #include "lutils.h"
 #include "bootstrap.h"
-#include "../efi/include/efi.h"
-#include "../efi/include/efilib.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -389,6 +388,8 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 #ifdef LOADER_EFI
+#include "../efi/include/efi.h"
+#include "../efi/include/efilib.h"
 extern EFI_SYSTEM_TABLE     *ST;
 extern EFI_BOOT_SERVICES    *BS;
 extern EFI_RUNTIME_SERVICES *RS;
@@ -486,8 +487,10 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
+#ifdef LOADER_EFI
 	{ "efi_get_vendor",   lua_efi_get_vendor },
     	{ "efi_get_variable", lua_efi_get_variable },
+#endif
 	{ NULL, NULL },
 };
 
