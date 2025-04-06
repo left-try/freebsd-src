@@ -32,8 +32,8 @@
 #include "lstd.h"
 #include "lutils.h"
 #include "bootstrap.h"
-#include <efi.h>
-#include <efilib.h> 
+#include "efi/include/efi.h"
+#include "efi/include/efilib.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
