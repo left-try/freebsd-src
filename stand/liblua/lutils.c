@@ -388,7 +388,7 @@ lua_writefile(lua_State *L)
 	lua_pushinteger(L, w);
 	return 1;
 }
-
+#ifdef LOADER_EFI
 extern EFI_SYSTEM_TABLE     *ST;
 extern EFI_BOOT_SERVICES    *BS;
 extern EFI_RUNTIME_SERVICES *RS;
@@ -468,6 +468,7 @@ lua_efi_get_variable(lua_State *L)
     }
     return 1;
 }
+#endif
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
