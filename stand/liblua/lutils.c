@@ -34,6 +34,9 @@
 #include "bootstrap.h"
 #include <efi.h>
 #include <efilib.h> 
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 /*
  * Like loader.perform, except args are passed already parsed
  * on the stack.
