@@ -62,6 +62,7 @@
 #include <camlib.h>
 #include "camcontrol.h"
 #include "nvmecontrol_ext.h"
+#include <libxo/xo.h>
 
 typedef enum {
 	CAM_CMD_NONE,
@@ -10390,6 +10391,9 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
+	xo_set_program_name(argv[0]);
+	xo_init(argc, argv);
+
 	/*
 	 * Ahh, getopt(3) is a pain.
 	 *
@@ -10774,6 +10778,6 @@ main(int argc, char **argv)
 
 	if (cam_dev != NULL)
 		cam_close_device(cam_dev);
-
+	xo_finish();
 	exit(error);
 }
