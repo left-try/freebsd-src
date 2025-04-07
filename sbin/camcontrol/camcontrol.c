@@ -10391,8 +10391,8 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
-	xo_set_program_name(argv[0]);
-	xo_init(argc, argv);
+	xo_set_program(argv[0]);
+	xo_parse_args(argc, argv);
 
 	/*
 	 * Ahh, getopt(3) is a pain.
