@@ -10350,6 +10350,8 @@ usage(int printlong)
 int
 main(int argc, char **argv)
 {
+	xo_set_program(argv[0]);
+	xo_parse_args(argc, argv);
 	int c;
 	char *device = NULL;
 	int unit = 0;
@@ -10391,8 +10393,6 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
-	xo_set_program(argv[0]);
-	xo_parse_args(argc, argv);
 
 	/*
 	 * Ahh, getopt(3) is a pain.
