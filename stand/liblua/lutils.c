@@ -469,12 +469,21 @@ lua_efi_get_variable(lua_State *L)
 #endif
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
-static const struct luaL_Reg loaderlib[] = {
-	REG_SIMPLE(command),
-@@ -401,6 +484,10 @@ static const struct luaL_Reg loaderlib[] = {
-	REG_SIMPLE(setenv),
-	REG_SIMPLE(time),
-	REG_SIMPLE(unsetenv),
+ static const struct luaL_Reg loaderlib[] = {
+ 	REG_SIMPLE(command),
+ 	REG_SIMPLE(command_error),
+ 	REG_SIMPLE(delay),
+ 	REG_SIMPLE(exit),
+ 	REG_SIMPLE(getenv),
+ 	REG_SIMPLE(has_command),
+ 	REG_SIMPLE(has_feature),
+ 	REG_SIMPLE(interpret),
+ 	REG_SIMPLE(parse),
+ 	REG_SIMPLE(perform),
+ 	REG_SIMPLE(printc),	/* Also registered as the global 'printc' */
+ 	REG_SIMPLE(setenv),
+ 	REG_SIMPLE(time),
+ 	REG_SIMPLE(unsetenv),
 #ifdef LOADER_EFI
  	{ "efi_get_vendor",   lua_efi_get_vendor },
      	{ "efi_get_variable", lua_efi_get_variable },
