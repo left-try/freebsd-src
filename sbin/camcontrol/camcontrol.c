@@ -10390,7 +10390,6 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
-
 	/*
 	 * Ahh, getopt(3) is a pain.
 	 *
@@ -10775,5 +10774,6 @@ main(int argc, char **argv)
 
 	if (cam_dev != NULL)
 		cam_close_device(cam_dev);
+	
 	exit(error);
 }
