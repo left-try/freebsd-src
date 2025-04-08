@@ -490,6 +490,17 @@ lua_efi_get_variable(lua_State *L)
 #endif
 	{ NULL, NULL },
 };
+
+static const struct luaL_Reg iolib[] = {
+	{ "close", lua_closefile },
+	REG_SIMPLE(getchar),
+	REG_SIMPLE(gets),
+	REG_SIMPLE(ischar),
+	{ "open", lua_openfile },
+	{ "read", lua_readfile },
+	{ "write", lua_writefile },
+	{ NULL, NULL },
+};
 #undef REG_SIMPLE
 
 static void
@@ -503,6 +514,56 @@ lua_add_feature(void *cookie, const char *name, const char *desc, bool enabled)
 	 */
 	lua_pushstring(L, desc);
 	lua_setfield(L, -2, name);
+}
+
+static void
+lua_add_features(lua_State *L)
+{
+
+	lua_newtable(L);
+	feature_iter(&lua_add_feature, L);
+
+	/*
+	 * We should still have just the table on the stack after we're done
+	 * iterating.
+	 */
+	lua_setfield(L, -2, "features");
+}
+
+int
+luaopen_loader(lua_State *L)
+{
+	luaL_newlib(L, loaderlib);
+	/* Add loader.machine and loader.machine_arch properties */
+	lua_pushstring(L, MACHINE);
+	lua_setfield(L, -2, "machine");
+	lua_pushstring(L, MACHINE_ARCH);
+	lua_setfield(L, -2, "machine_arch");
+	lua_pushstring(L, LUA_PATH);
+	lua_setfield(L, -2, "lua_path");
+	lua_pushinteger(L, bootprog_rev);
+	lua_setfield(L, -2, "version");
+	lua_pushinteger(L, CMD_OK);
+	lua_setfield(L, -2, "CMD_OK");
+	lua_pushinteger(L, CMD_WARN);
+	lua_setfield(L, -2, "CMD_WARN");
+	lua_pushinteger(L, CMD_ERROR);
+	lua_setfield(L, -2, "CMD_ERROR");
+	lua_pushinteger(L, CMD_CRIT);
+	lua_setfield(L, -2, "CMD_CRIT");
+	lua_pushinteger(L, CMD_FATAL);
+	lua_setfield(L, -2, "CMD_FATAL");
+	lua_add_features(L);
+	/* Set global printc to loader.printc */
+	lua_register(L, "printc", lua_printc);
+	return 1;
+}
+
+int
+luaopen_io(lua_State *L)
+{
+	luaL_newlib(L, iolib);
+	return 1;
 }
 
 static void
