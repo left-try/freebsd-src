@@ -385,109 +385,22 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
-#ifdef LOADER_EFI
-#include "../efi/include/efi.h"
-#include "../efi/include/efilib.h"
-
-extern EFI_SYSTEM_TABLE     *ST;
-extern EFI_BOOT_SERVICES    *BS;
-extern EFI_RUNTIME_SERVICES *RS;
-
-static int
-lua_efi_get_vendor(lua_State *L)
-{
-    if (ST == NULL || ST->FirmwareVendor == NULL) {
-        lua_pushnil(L);
-    } else {
-        CHAR16 *fwvendor = ST->FirmwareVendor;
-        char vendor[128];
-        size_t i;
-        for (i = 0; i < sizeof(vendor)-1 && fwvendor[i] != 0; i++) {
-            vendor[i] = (fwvendor[i] < 128 ? fwvendor[i] : '?');
-        }
-        vendor[i] = '\0';
-        lua_pushstring(L, vendor);
-    }
-    return 1;
-}
-
-static CHAR16 *
-ascii_to_ucs2(const char *ascii)
-{
-    size_t len = strlen(ascii);
-    CHAR16 *wbuf = malloc((len + 1) * sizeof(CHAR16));
-    if (wbuf == NULL)
-        return NULL;
-    for (size_t i = 0; i < len; i++)
-        wbuf[i] = ascii[i];
-    wbuf[len] = 0;
-    return wbuf;
-}
-
-static int
-lua_efi_get_variable(lua_State *L)
-{
-    const char *varname = luaL_checkstring(L, 1);
-    if (varname == NULL) {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    CHAR16 *wvarname = ascii_to_ucs2(varname);
-    if (wvarname == NULL) {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    EFI_GUID GlobalVarGuid = EFI_GLOBAL_VARIABLE;
-    UINTN dataSize = 0;
-    EFI_STATUS status;
-
-    status = RS->GetVariable(wvarname, &GlobalVarGuid, NULL, &dataSize, NULL);
-    if (status == EFI_BUFFER_TOO_SMALL && dataSize > 0) {
-        UINT8 *data = malloc(dataSize);
-        if (!data) {
-            free(wvarname);
-            lua_pushnil(L);
-            return 1;
-        }
-        status = RS->GetVariable(wvarname, &GlobalVarGuid, NULL, &dataSize, data);
-        free(wvarname);
-        if (EFI_ERROR(status)) {
-            free(data);
-            lua_pushnil(L);
-        } else {
-            lua_pushlstring(L, (const char *)data, dataSize);
-            free(data);
-        }
-    } else {
-        free(wvarname);
-        lua_pushnil(L);
-    }
-    return 1;
-}
-#endif
-
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
- static const struct luaL_Reg loaderlib[] = {
- 	REG_SIMPLE(command),
- 	REG_SIMPLE(command_error),
- 	REG_SIMPLE(delay),
- 	REG_SIMPLE(exit),
- 	REG_SIMPLE(getenv),
- 	REG_SIMPLE(has_command),
- 	REG_SIMPLE(has_feature),
- 	REG_SIMPLE(interpret),
- 	REG_SIMPLE(parse),
- 	REG_SIMPLE(perform),
- 	REG_SIMPLE(printc),	/* Also registered as the global 'printc' */
- 	REG_SIMPLE(setenv),
- 	REG_SIMPLE(time),
- 	REG_SIMPLE(unsetenv),
-#ifdef LOADER_EFI
- 	{ "efi_get_vendor",   lua_efi_get_vendor },
-     	{ "efi_get_variable", lua_efi_get_variable },
-#endif
+static const struct luaL_Reg loaderlib[] = {
+	REG_SIMPLE(command),
+	REG_SIMPLE(command_error),
+	REG_SIMPLE(delay),
+	REG_SIMPLE(exit),
+	REG_SIMPLE(getenv),
+	REG_SIMPLE(has_command),
+	REG_SIMPLE(has_feature),
+	REG_SIMPLE(interpret),
+	REG_SIMPLE(parse),
+	REG_SIMPLE(perform),
+	REG_SIMPLE(printc),	/* Also registered as the global 'printc' */
+	REG_SIMPLE(setenv),
+	REG_SIMPLE(time),
+	REG_SIMPLE(unsetenv),
 	{ NULL, NULL },
 };
 
@@ -514,56 +427,6 @@ lua_add_feature(void *cookie, const char *name, const char *desc, bool enabled)
 	 */
 	lua_pushstring(L, desc);
 	lua_setfield(L, -2, name);
-}
-
-static void
-lua_add_features(lua_State *L)
-{
-
-	lua_newtable(L);
-	feature_iter(&lua_add_feature, L);
-
-	/*
-	 * We should still have just the table on the stack after we're done
-	 * iterating.
-	 */
-	lua_setfield(L, -2, "features");
-}
-
-int
-luaopen_loader(lua_State *L)
-{
-	luaL_newlib(L, loaderlib);
-	/* Add loader.machine and loader.machine_arch properties */
-	lua_pushstring(L, MACHINE);
-	lua_setfield(L, -2, "machine");
-	lua_pushstring(L, MACHINE_ARCH);
-	lua_setfield(L, -2, "machine_arch");
-	lua_pushstring(L, LUA_PATH);
-	lua_setfield(L, -2, "lua_path");
-	lua_pushinteger(L, bootprog_rev);
-	lua_setfield(L, -2, "version");
-	lua_pushinteger(L, CMD_OK);
-	lua_setfield(L, -2, "CMD_OK");
-	lua_pushinteger(L, CMD_WARN);
-	lua_setfield(L, -2, "CMD_WARN");
-	lua_pushinteger(L, CMD_ERROR);
-	lua_setfield(L, -2, "CMD_ERROR");
-	lua_pushinteger(L, CMD_CRIT);
-	lua_setfield(L, -2, "CMD_CRIT");
-	lua_pushinteger(L, CMD_FATAL);
-	lua_setfield(L, -2, "CMD_FATAL");
-	lua_add_features(L);
-	/* Set global printc to loader.printc */
-	lua_register(L, "printc", lua_printc);
-	return 1;
-}
-
-int
-luaopen_io(lua_State *L)
-{
-	luaL_newlib(L, iolib);
-	return 1;
 }
 
 static void
