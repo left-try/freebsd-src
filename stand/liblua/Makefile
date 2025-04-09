@@ -38,6 +38,7 @@ CFLAGS+= -I${BOOTSRC}/include -I${LIBLUASRC} -I${LUASRC} -I${LDRSRC}
 CFLAGS+= -I${SRCTOP}/stand/efi/include
 CFLAGS += -DEFI_LOADER
 CFLAGS += -I${SRCTOP}/stand/efi/include/${MACHINE_ARCH}
+CFLAGS += -I${SRCTOP}/stand/efi
 
 CFLAGS.gfx_utils.c+= -I${SRCTOP}/sys/teken -I${SRCTOP}/contrib/pnglite
 CFLAGS.lhash.c+= -I${FLUALIB}/libhash -I${SRCTOP}/sys/crypto/sha2
