@@ -10774,6 +10774,5 @@ main(int argc, char **argv)
 
 	if (cam_dev != NULL)
 		cam_close_device(cam_dev);
-
 	exit(error);
 }
