@@ -387,6 +387,7 @@ lua_writefile(lua_State *L)
 
 #ifdef EFI_LOADER
 #include "efi.h"
+#include "efilib.h"
 
 extern EFI_SYSTEM_TABLE		*ST;
 extern EFI_BOOT_SERVICES	*BS;
