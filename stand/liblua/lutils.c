@@ -389,10 +389,6 @@ lua_writefile(lua_State *L)
 #include "efi.h"
 #include "efilib.h"
 
-extern EFI_SYSTEM_TABLE     *ST;
-extern EFI_BOOT_SERVICES    *BS;
-extern EFI_RUNTIME_SERVICES *RS;
-
 static int
 lua_efi_get_vendor(lua_State *L)
 {
