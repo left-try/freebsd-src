@@ -385,7 +385,6 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
-#ifdef LOADER_EFI
 #include "../efi/include/efi.h"
 #include "../efi/include/efilib.h"
 
@@ -411,63 +410,6 @@ lua_efi_get_vendor(lua_State *L)
     return 1;
 }
 
-static CHAR16 *
-ascii_to_ucs2(const char *ascii)
-{
-    size_t len = strlen(ascii);
-    CHAR16 *wbuf = malloc((len + 1) * sizeof(CHAR16));
-    if (wbuf == NULL)
-        return NULL;
-    for (size_t i = 0; i < len; i++)
-        wbuf[i] = ascii[i];
-    wbuf[len] = 0;
-    return wbuf;
-}
-
-static int
-lua_efi_get_variable(lua_State *L)
-{
-    const char *varname = luaL_checkstring(L, 1);
-    if (varname == NULL) {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    CHAR16 *wvarname = ascii_to_ucs2(varname);
-    if (wvarname == NULL) {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    EFI_GUID GlobalVarGuid = EFI_GLOBAL_VARIABLE;
-    UINTN dataSize = 0;
-    EFI_STATUS status;
-
-    status = RS->GetVariable(wvarname, &GlobalVarGuid, NULL, &dataSize, NULL);
-    if (status == EFI_BUFFER_TOO_SMALL && dataSize > 0) {
-        UINT8 *data = malloc(dataSize);
-        if (!data) {
-            free(wvarname);
-            lua_pushnil(L);
-            return 1;
-        }
-        status = RS->GetVariable(wvarname, &GlobalVarGuid, NULL, &dataSize, data);
-        free(wvarname);
-        if (EFI_ERROR(status)) {
-            free(data);
-            lua_pushnil(L);
-        } else {
-            lua_pushlstring(L, (const char *)data, dataSize);
-            free(data);
-        }
-    } else {
-        free(wvarname);
-        lua_pushnil(L);
-    }
-    return 1;
-}
-#endif
-
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(command),
@@ -484,10 +426,7 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
-#ifdef LOADER_EFI
  	{ "efi_get_vendor",   lua_efi_get_vendor },
-     	{ "efi_get_variable", lua_efi_get_variable },
-#endif
 	{ NULL, NULL },
 };
 
