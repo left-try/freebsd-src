@@ -32,6 +32,8 @@
 #include "lstd.h"
 #include "lutils.h"
 #include "bootstrap.h"
+#include "efi.h"
+#include "efilib.h"
 
 /*
  * Like loader.perform, except args are passed already parsed
@@ -384,9 +386,6 @@ lua_writefile(lua_State *L)
 	lua_pushinteger(L, w);
 	return 1;
 }
-
-#include "efi/include/efi.h"
-#include "efi/include/efilib.h"
 
 extern EFI_SYSTEM_TABLE     *ST;
 extern EFI_BOOT_SERVICES    *BS;
