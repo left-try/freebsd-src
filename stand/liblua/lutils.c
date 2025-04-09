@@ -385,8 +385,8 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
-#include "../efi/include/efi.h"
-#include "../efi/include/efilib.h"
+#include "efi/include/efi.h"
+#include "efi/include/efilib.h"
 
 extern EFI_SYSTEM_TABLE     *ST;
 extern EFI_BOOT_SERVICES    *BS;
