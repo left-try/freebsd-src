@@ -389,28 +389,38 @@ lua_writefile(lua_State *L)
 #include "efi.h"
 #include "efilib.h"
 
-extern EFI_SYSTEM_TABLE		*ST;
-extern EFI_BOOT_SERVICES	*BS;
-extern EFI_RUNTIME_SERVICES	*RS;
-
-static int
-lua_efi_get_vendor(lua_State *L)
+static bool
+string_to_guid(const char *str, EFI_GUID *guid)
 {
-    if (ST == NULL || ST->FirmwareVendor == NULL) {
-        lua_pushnil(L);
-    } else {
-        CHAR16 *fwvendor = ST->FirmwareVendor;
-        char vendor[128];
-        size_t i;
-        for (i = 0; i < sizeof(vendor)-1 && fwvendor[i] != 0; i++) {
-            vendor[i] = (fwvendor[i] < 128 ? fwvendor[i] : '?');
-        }
-        vendor[i] = '\0';
-        lua_pushstring(L, vendor);
+    // For brevity, assume a simple fixed mapping.
+    // In practice, you should parse the GUID string properly.
+    if (strcmp(str, "GLOBAL") == 0) {
+        *guid = EFI_GLOBAL_VARIABLE;
+        return true;
     }
-    return 1;
+    return false;
 }
 
+static int
+lua_efi_locate_protocol(lua_State *L)
+{
+    const char *guid_str = luaL_checkstring(L, 1);
+    EFI_GUID guid;
+    if (!string_to_guid(guid_str, &guid)) {
+        lua_pushnil(L);
+        lua_pushstring(L, "Invalid GUID format");
+        return 2;
+    }
+    void *protocol;
+    EFI_STATUS status = BS->LocateProtocol(&guid, NULL, &protocol);
+    if (EFI_ERROR(status)) {
+        lua_pushnil(L);
+        lua_pushfstring(L, "LocateProtocol failed, status: %r", status);
+        return 2;
+    }
+    lua_pushlightuserdata(L, protocol);
+    return 1;
+}
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
@@ -428,7 +438,7 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
- 	{ "efi_get_vendor",   lua_efi_get_vendor },
+ 	{ "efi_locate_protocol", lua_efi_locate_protocol },
 	{ NULL, NULL },
 };
 

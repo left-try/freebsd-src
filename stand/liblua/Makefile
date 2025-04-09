@@ -36,10 +36,9 @@ CFLAGS+= -ffreestanding -nostdlib -DLUA_USE_POSIX
 CFLAGS+= -fno-stack-protector -D__BSD_VISIBLE
 CFLAGS+= -I${BOOTSRC}/include -I${LIBLUASRC} -I${LUASRC} -I${LDRSRC}
 
-CFLAGS += -DEFI_LOADER
 CFLAGS+= -I${SRCTOP}/stand/efi/include
 CFLAGS += -I${SRCTOP}/stand/efi/include/${MACHINE_ARCH}
-CFLAGS += -I${SRCTOP}/stand/efi
+CFLAGS += -I${SRCTOP}/stand/efi/loader
 
 CFLAGS.gfx_utils.c+= -I${SRCTOP}/sys/teken -I${SRCTOP}/contrib/pnglite
 CFLAGS.lhash.c+= -I${FLUALIB}/libhash -I${SRCTOP}/sys/crypto/sha2
