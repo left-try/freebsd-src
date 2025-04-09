@@ -32,8 +32,6 @@
 #include "lstd.h"
 #include "lutils.h"
 #include "bootstrap.h"
-#include "efi.h"
-#include "efilib.h"
 
 /*
  * Like loader.perform, except args are passed already parsed
@@ -387,6 +385,10 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
+#ifdef EFI_LOADER
+#include "efi.h"
+#include "efilib.h"
+
 extern EFI_SYSTEM_TABLE     *ST;
 extern EFI_BOOT_SERVICES    *BS;
 extern EFI_RUNTIME_SERVICES *RS;
@@ -408,6 +410,7 @@ lua_efi_get_vendor(lua_State *L)
     }
     return 1;
 }
+#endif
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
@@ -425,7 +428,9 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
+#ifdef EFI_LOADER
  	{ "efi_get_vendor",   lua_efi_get_vendor },
+#endif
 	{ NULL, NULL },
 };
 
