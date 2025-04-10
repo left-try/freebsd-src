@@ -395,7 +395,7 @@ string_to_guid(const char *str, EFI_GUID *guid)
     // For brevity, assume a simple fixed mapping.
     // In practice, you should parse the GUID string properly.
     if (strcmp(str, "GLOBAL") == 0) {
-        *guid = EFI_GLOBAL_VARIABLE;
+        *guid = (EFI_GUID)EFI_GLOBAL_VARIABLE;
         return true;
     }
     return false;
