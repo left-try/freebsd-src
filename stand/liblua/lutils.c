@@ -439,7 +439,20 @@ lua_efi_get_table(lua_State *L)
     }
     return 1;
 }
+
+static int
+lua_efi_dummy_check(lua_State *L)
+{
+	lua_pushlstring(L, "hui_efi");
+}
+
 #endif
+
+static int
+lua_dummy_check(lua_State *L)
+{
+	lua_pushlstring(L, "hui");
+}
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
@@ -457,9 +470,11 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
+	REG_SIMPLE(dummy_check),
 	#ifdef EFI
  	//{ "efi_locate_protocol", lua_efi_locate_protocol },
-	{"lua_efi_get_table", lua_efi_get_table},
+	REG_SIMPLE(efi_get_table),
+	REG_SIMPLE(efi_dummy_check),
 	#endif
 	{ NULL, NULL },
 };
