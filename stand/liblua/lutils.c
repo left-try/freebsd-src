@@ -443,7 +443,7 @@ lua_efi_get_table(lua_State *L)
 static int
 lua_efi_dummy_check(lua_State *L)
 {
-	lua_pushlstring(L, "hui_efi");
+	lua_pushinteger(L, 1);
 }
 
 #endif
@@ -451,7 +451,7 @@ lua_efi_dummy_check(lua_State *L)
 static int
 lua_dummy_check(lua_State *L)
 {
-	lua_pushlstring(L, "hui");
+	lua_pushinteger(L, 1);
 }
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
