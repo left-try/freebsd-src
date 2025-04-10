@@ -385,11 +385,10 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
-
+#ifdef EFI
 #include "efi.h"
 #include "efilib.h"
 
-extern EFI_BOOT_SERVICES *BS;
 
 static bool
 string_to_guid(const char *str, EFI_GUID *guid)
@@ -428,11 +427,19 @@ static int
 lua_efi_get_table(lua_State *L)
 {
 	const char *guid_str = luaL_checkstring(L, 1);
-    EFI_GUID guid = NULL;
-	efi_get_table(guid);
-	return 1;
+    efi_guid_t guid;
+    if (!parse_guid(guid_str, &guid)) {
+        return luaL_error(L, "efi.get_table: invalid GUID '%s'", guid_str);
+    }
+    void *ptr = efi_get_table(&guid);
+    if (ptr == NULL) {
+        lua_pushnil(L);
+    } else {
+        lua_pushlightuserdata(L, ptr);
+    }
+    return 1;
 }
-
+#endif
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
@@ -450,8 +457,10 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
+	#ifdef EFI
  	//{ "efi_locate_protocol", lua_efi_locate_protocol },
 	{"lua_efi_get_table", lua_efi_get_table},
+	#endif
 	{ NULL, NULL },
 };
 
