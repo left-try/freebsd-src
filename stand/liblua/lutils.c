@@ -428,7 +428,7 @@ static int
 lua_efi_get_table(lua_State *L)
 {
 	const char *guid_str = luaL_checkstring(L, 1);
-    EFI_GUID* guid = NULL;
+    EFI_GUID guid = NULL;
 	efi_get_table(guid);
 	return 1;
 }
