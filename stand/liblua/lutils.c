@@ -401,6 +401,7 @@ string_to_guid(const char *str, EFI_GUID *guid)
     return false;
 }
 
+/*
 static int
 lua_efi_locate_protocol(lua_State *L)
 {
@@ -421,6 +422,22 @@ lua_efi_locate_protocol(lua_State *L)
     lua_pushlightuserdata(L, protocol);
     return 1;
 }
+	*/
+
+static int
+lua_efi_get_table(lua_State *L)
+{
+	const char *guid_str = luaL_checkstring(L, 1);
+    EFI_GUID guid;
+    if (!string_to_guid(guid_str, &guid)) {
+        lua_pushnil(L);
+        lua_pushstring(L, "Invalid GUID format");
+        return 2;
+    }
+	efi_get_table(guid);
+	return 1;
+}
+
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
@@ -438,7 +455,8 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
- 	{ "efi_locate_protocol", lua_efi_locate_protocol },
+ 	//{ "efi_locate_protocol", lua_efi_locate_protocol },
+	{"lua_efi_get_table", lua_efi_get_table},
 	{ NULL, NULL },
 };
 
