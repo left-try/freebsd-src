@@ -444,6 +444,7 @@ static int
 lua_efi_dummy_check(lua_State *L)
 {
 	lua_pushinteger(L, 1);
+	return 1;
 }
 
 #endif
@@ -452,6 +453,7 @@ static int
 lua_dummy_check(lua_State *L)
 {
 	lua_pushinteger(L, 1);
+	return 1;
 }
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
