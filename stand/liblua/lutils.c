@@ -428,12 +428,7 @@ static int
 lua_efi_get_table(lua_State *L)
 {
 	const char *guid_str = luaL_checkstring(L, 1);
-    EFI_GUID guid;
-    if (!string_to_guid(guid_str, &guid)) {
-        lua_pushnil(L);
-        lua_pushstring(L, "Invalid GUID format");
-        return 2;
-    }
+    EFI_GUID* guid = NULL;
 	efi_get_table(guid);
 	return 1;
 }
