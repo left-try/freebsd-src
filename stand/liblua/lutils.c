@@ -437,6 +437,14 @@ lua_efi_get_table(lua_State *L)
     }
     return 1;
 }
+
+static int
+lua_check(lua_State *L)
+{
+	lua_pushinteger(L, 1);
+	return 1;
+}
+
 #endif
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
@@ -458,6 +466,7 @@ static const struct luaL_Reg loaderlib[] = {
 #if defined(EFI)
 	REG_SIMPLE(efi_get_table),
 	REG_SIMPLE(efi_locate_protocol),
+	REG_SIMPLE(check),
 #endif
 	{ NULL, NULL },
 };
