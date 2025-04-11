@@ -474,7 +474,7 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(unsetenv),
 	REG_SIMPLE(check),
 	#ifdef EFI
- 	//{ "efi_locate_protocol", lua_efi_locate_protocol },
+ 	REG_SIMPLE(efi_locate_protocol),
 	REG_SIMPLE(efi_get_table),
 	REG_SIMPLE(efi_dummy_check),
 	#endif
@@ -546,6 +546,7 @@ luaopen_loader(lua_State *L)
 	lua_add_features(L);
 	/* Set global printc to loader.printc */
 	lua_register(L, "printc", lua_printc);
+	lua_register(L, "dummy_check", lua_dummy_check);
 	return 1;
 }
 
