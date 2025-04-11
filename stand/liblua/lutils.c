@@ -528,7 +528,6 @@ luaopen_loader(lua_State *L)
 	lua_add_features(L);
 	/* Set global printc to loader.printc */
 	lua_register(L, "printc", lua_printc);
-	lua_register(L, "dummy_check", lua_check);
 	return 1;
 }
 
