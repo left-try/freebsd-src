@@ -32,6 +32,10 @@
 #include "lstd.h"
 #include "lutils.h"
 #include "bootstrap.h"
+#if defined(EFI)
+#include "efi.h"
+#include "efilib.h"
+#endif
 
 /*
  * Like loader.perform, except args are passed already parsed
@@ -385,10 +389,7 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
-#include "efi.h"
-#include "efilib.h"
-
-
+#if defined(EFI)
 static bool
 string_to_guid(const char *str, EFI_GUID *guid)
 {
@@ -399,7 +400,6 @@ string_to_guid(const char *str, EFI_GUID *guid)
     return false;
 }
 
-/*
 static int
 lua_efi_locate_protocol(lua_State *L)
 {
@@ -420,7 +420,6 @@ lua_efi_locate_protocol(lua_State *L)
     lua_pushlightuserdata(L, protocol);
     return 1;
 }
-	*/
 
 static int
 lua_efi_get_table(lua_State *L)
@@ -438,20 +437,7 @@ lua_efi_get_table(lua_State *L)
     }
     return 1;
 }
-
-static int
-lua_efi_dummy_check(lua_State *L)
-{
-	lua_pushinteger(L, 1);
-	return 1;
-}
-
-static int
-lua_check(lua_State *L)
-{
-	lua_pushinteger(L, 1);
-	return 1;
-}
+#endif
 
 #define REG_SIMPLE(n)	{ #n, lua_ ## n }
 static const struct luaL_Reg loaderlib[] = {
@@ -470,8 +456,10 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
 	REG_SIMPLE(check),
+#if defined(EFI)
 	REG_SIMPLE(efi_get_table),
-	REG_SIMPLE(efi_dummy_check),
+	REG_SIMPLE(efi_locate_protocol),
+#endif
 	{ NULL, NULL },
 };
 
