@@ -38,6 +38,7 @@ CFLAGS+= -I${BOOTSRC}/include -I${LIBLUASRC} -I${LUASRC} -I${LDRSRC}
 
 CFLAGS+= -I${SRCTOP}/stand/efi/include
 CFLAGS += -I${SRCTOP}/stand/efi/include/${MACHINE_ARCH}
+CFLAGS+=	-DEFI
 
 
 CFLAGS.gfx_utils.c+= -I${SRCTOP}/sys/teken -I${SRCTOP}/contrib/pnglite
