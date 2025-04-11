@@ -426,7 +426,7 @@ static int
 lua_efi_get_table(lua_State *L)
 {
 	const char *guid_str = luaL_checkstring(L, 1);
-    efi_guid_t guid;
+    EFI_GUID guid;
     if (!parse_guid(guid_str, &guid)) {
         return luaL_error(L, "efi.get_table: invalid GUID '%s'", guid_str);
     }
