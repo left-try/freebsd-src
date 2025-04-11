@@ -455,7 +455,6 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
-	REG_SIMPLE(check),
 #if defined(EFI)
 	REG_SIMPLE(efi_get_table),
 	REG_SIMPLE(efi_locate_protocol),
