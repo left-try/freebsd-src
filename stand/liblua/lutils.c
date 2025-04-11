@@ -450,7 +450,7 @@ lua_efi_dummy_check(lua_State *L)
 #endif
 
 static int
-lua_dummy_check(lua_State *L)
+lua_check(lua_State *L)
 {
 	lua_pushinteger(L, 1);
 	return 1;
@@ -472,7 +472,7 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(setenv),
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
-	REG_SIMPLE(dummy_check),
+	REG_SIMPLE(check),
 	#ifdef EFI
  	//{ "efi_locate_protocol", lua_efi_locate_protocol },
 	REG_SIMPLE(efi_get_table),
