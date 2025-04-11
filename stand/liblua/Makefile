@@ -37,8 +37,15 @@ CFLAGS+= -fno-stack-protector -D__BSD_VISIBLE
 CFLAGS+= -I${BOOTSRC}/include -I${LIBLUASRC} -I${LUASRC} -I${LDRSRC}
 
 CFLAGS+= -I${SRCTOP}/stand/efi/include
-CFLAGS += -I${SRCTOP}/stand/efi/include/${MACHINE_ARCH}
-CFLAGS+=	-DEFI
+CFLAGS+= -I${SRCTOP}/stand/efi/include/${MACHINE_ARCH}
+CFLAGS+= -DEFI
+CFLAGS+= -I${EFIINC} -I${EFIINCMD}
+.if ${MACHINE_CPUARCH} == "amd64"
+LIBEFI= ${BOOTOBJ}/efi/libefi/libefi.a
+DPADD+= ${LIBEFI}
+LDADD+= ${LIBEFI}
+.endif
+
 
 
 CFLAGS.gfx_utils.c+= -I${SRCTOP}/sys/teken -I${SRCTOP}/contrib/pnglite

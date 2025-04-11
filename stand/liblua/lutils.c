@@ -390,8 +390,6 @@ lua_writefile(lua_State *L)
 }
 
 #if defined(EFI)
-/*
-extern EFI_BOOT_SERVICES	*BS;
 
 static bool
 string_to_guid(const char *str, EFI_GUID *guid)
