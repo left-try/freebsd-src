@@ -38,13 +38,18 @@ CFLAGS+= -I${BOOTSRC}/include -I${LIBLUASRC} -I${LUASRC} -I${LDRSRC}
 
 CFLAGS+= -DEFI
 CFLAGS+= -I${SRCTOP}/stand/efi/include -I${SRCTOP}/stand/efi/include/${MACHINE_ARCH}
-.if ${MACHINE_ARCH} == "amd64"
-LIBEFI= ${BOOTOBJ}/efi/libefi/libefi.a
-DPADD+= ${LIBEFI}
-LDADD+= ${LIBEFI}
+LDFLAGS+= -u efi_get_table
+
+LIBEFI=		${BOOTOBJ}/efi/libefi/libefi.a
+LIBEFI32=	${BOOTOBJ}/efi/libefi32/libefi.a
+
+.if ${MACHINE} == "i386"
+DPADD=		${LIBEFI32}
+LDADD=		${LIBEFI32}
+.else
+DPADD=		${LIBEFI}
+LDADD=		${LIBEFI}
 .endif
-
-
 
 CFLAGS.gfx_utils.c+= -I${SRCTOP}/sys/teken -I${SRCTOP}/contrib/pnglite
 CFLAGS.lhash.c+= -I${FLUALIB}/libhash -I${SRCTOP}/sys/crypto/sha2

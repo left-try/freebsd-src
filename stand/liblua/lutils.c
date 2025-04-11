@@ -391,6 +391,14 @@ lua_writefile(lua_State *L)
 
 #if defined(EFI)
 
+extern EFI_BOOT_SERVICES *BS;
+extern void *efi_get_table(EFI_GUID *tbl);
+static void force_link_efi_get_table(void) {
+    /* Force the linker to pull in the symbol */
+    volatile void *p = efi_get_table(NULL);
+    (void)p;
+}
+
 static bool
 string_to_guid(const char *str, EFI_GUID *guid)
 {
@@ -425,6 +433,7 @@ lua_efi_locate_protocol(lua_State *L)
 static int
 lua_efi_get_table(lua_State *L)
 {
+	force_link_efi_get_table();
 	const char *guid_str = luaL_checkstring(L, 1);
     EFI_GUID guid;
     if (!string_to_guid(guid_str, &guid)) {
