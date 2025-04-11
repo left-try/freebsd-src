@@ -385,7 +385,6 @@ lua_writefile(lua_State *L)
 	return 1;
 }
 
-#ifdef EFI
 #include "efi.h"
 #include "efilib.h"
 
@@ -447,8 +446,6 @@ lua_efi_dummy_check(lua_State *L)
 	return 1;
 }
 
-#endif
-
 static int
 lua_check(lua_State *L)
 {
@@ -473,11 +470,8 @@ static const struct luaL_Reg loaderlib[] = {
 	REG_SIMPLE(time),
 	REG_SIMPLE(unsetenv),
 	REG_SIMPLE(check),
-	#ifdef EFI
- 	REG_SIMPLE(efi_locate_protocol),
 	REG_SIMPLE(efi_get_table),
 	REG_SIMPLE(efi_dummy_check),
-	#endif
 	{ NULL, NULL },
 };
 
